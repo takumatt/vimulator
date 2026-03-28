@@ -2,7 +2,7 @@
 
 Vimium-style keyboard navigation for iOS Simulator.
 
-![hint mode screenshot](assets/screenshot.png)
+<img src="assets/screenshot.png" width="300" />
 
 ## Features
 
