@@ -24,6 +24,17 @@ extension UIApplication {
         vim_sendEvent(event)
 
         guard let pressesEvent = event as? UIPressesEvent else { return }
+
+        // While a text input is active, let UIKit handle all keys except Escape
+        if let responder = UIResponder.currentFirstResponder, responder is UITextInput {
+            for press in pressesEvent.allPresses where press.phase == .began {
+                if press.key?.keyCode == .keyboardEscape {
+                    responder.resignFirstResponder()
+                }
+            }
+            return
+        }
+
         for press in pressesEvent.allPresses where press.phase == .began {
             guard let key = press.key else { continue }
             let char = key.characters
