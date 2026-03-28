@@ -2,6 +2,8 @@
 
 Vimium-style keyboard navigation for iOS Simulator.
 
+![hint mode screenshot](assets/screenshot.png)
+
 ## Features
 
 | Key | Action |
