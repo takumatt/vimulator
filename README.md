@@ -2,7 +2,7 @@
 
 Vimium-style keyboard navigation for iOS Simulator.
 
-<img src="assets/screenshot.png" width="300" />
+<video src="assets/demo.mp4" autoplay loop muted width="300" />
 
 ## Why not Vimac / Homerow?
 
