@@ -4,6 +4,12 @@ Vimium-style keyboard navigation for iOS Simulator.
 
 <img src="assets/screenshot.png" width="300" />
 
+## Why not Vimac / Homerow?
+
+macOS-level tools like Vimac and Homerow work via the Accessibility API over IPC — they live outside your app process, which introduces noticeable latency on every hint activation and scroll event.
+
+Vimulator runs **inside your app process**. It talks directly to UIKit with no IPC overhead, so hint activation and scrolling respond within a single frame.
+
 ## Features
 
 | Key | Action |
