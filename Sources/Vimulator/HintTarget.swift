@@ -5,41 +5,49 @@ struct HintTarget {
     let element: NSObject
     let hint: String
 
-    /// Activate the element.
-    /// 1. Try `accessibilityActivate()` (works for most UIKit / SwiftUI elements)
-    /// 2. Fall back to `UIControl.sendActions(for: .touchUpInside)` via hit-test
     @discardableResult
     func activate() -> Bool {
+        // Text inputs need becomeFirstResponder — accessibilityActivate() alone
+        // doesn't reliably trigger keyboard input in SwiftUI.
+        if tryFocusTextInput() { return true }
         if element.accessibilityActivate() { return true }
         return fallbackActivate()
     }
 
-    private func fallbackActivate() -> Bool {
+    /// Hit-test the element's frame and walk up the hierarchy looking for a
+    /// UITextField or UITextView, then call becomeFirstResponder().
+    private func tryFocusTextInput() -> Bool {
         let frame = element.accessibilityFrame
-        guard frame != .zero,
-              let window = keyWindow() else { return false }
-
-        let localPoint = window.convert(
-            CGPoint(x: frame.midX, y: frame.midY),
-            from: nil
-        )
-
+        guard frame != .zero, let window = keyWindow() else { return false }
+        let localPoint = window.convert(CGPoint(x: frame.midX, y: frame.midY), from: nil)
         guard let hit = window.hitTest(localPoint, with: nil) else { return false }
 
-        if let control = closestControl(from: hit) {
-            control.sendActions(for: .touchUpInside)
-            return true
+        var view: UIView? = hit
+        while let v = view {
+            if (v is UITextField || v is UITextView), let responder = v as? UIResponder {
+                responder.becomeFirstResponder()
+                return true
+            }
+            view = v.superview
         }
         return false
     }
 
-    private func closestControl(from view: UIView) -> UIControl? {
-        var v: UIView? = view
+    private func fallbackActivate() -> Bool {
+        let frame = element.accessibilityFrame
+        guard frame != .zero, let window = keyWindow() else { return false }
+        let localPoint = window.convert(CGPoint(x: frame.midX, y: frame.midY), from: nil)
+        guard let hit = window.hitTest(localPoint, with: nil) else { return false }
+
+        var v: UIView? = hit
         while let current = v {
-            if let control = current as? UIControl, control.isEnabled { return control }
+            if let control = current as? UIControl, control.isEnabled {
+                control.sendActions(for: .touchUpInside)
+                return true
+            }
             v = current.superview
         }
-        return nil
+        return false
     }
 
     private func keyWindow() -> UIWindow? {
