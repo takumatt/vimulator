@@ -1,6 +1,7 @@
 # Xcode user data
 xcuserdata/
 *.xcuserstate
+.DS_Store
 
 # Build artifacts
 .build/
