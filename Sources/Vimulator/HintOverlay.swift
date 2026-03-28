@@ -5,9 +5,26 @@ final class HintOverlay {
     private var window: UIWindow?
     private var labels: [String: HintLabel] = [:]  // hint string → label
 
-    func show(hints: [HintTarget], style: HintLabelStyle, in keyWindow: UIWindow) {
+    func show(hints: [HintTarget], style: HintLabelStyle, overlayEffect: HintOverlayEffect, in keyWindow: UIWindow) {
         let overlayWindow = makeWindow(over: keyWindow)
         window = overlayWindow
+
+        // Overlay effect (dim or blur)
+        switch overlayEffect {
+        case .none:
+            break
+        case .dim(let color):
+            let dimView = UIView(frame: overlayWindow.bounds)
+            dimView.backgroundColor = color
+            dimView.isUserInteractionEnabled = false
+            overlayWindow.addSubview(dimView)
+        case .blur(let blurStyle, let opacity):
+            let blurView = UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
+            blurView.frame = overlayWindow.bounds
+            blurView.alpha = opacity
+            blurView.isUserInteractionEnabled = false
+            overlayWindow.addSubview(blurView)
+        }
 
         let container = UIView(frame: overlayWindow.bounds)
         container.isUserInteractionEnabled = false
