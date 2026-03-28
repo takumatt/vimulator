@@ -23,8 +23,7 @@ extension UIApplication {
         // Call original (swizzled, so this calls the real sendEvent)
         vim_sendEvent(event)
 
-        guard event.type == .presses,
-              let pressesEvent = event as? UIPressesEvent else { return }
+        guard let pressesEvent = event as? UIPressesEvent else { return }
         for press in pressesEvent.allPresses where press.phase == .began {
             guard let key = press.key else { continue }
             let char = key.characters
