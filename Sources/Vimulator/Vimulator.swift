@@ -21,8 +21,13 @@ public final class Vimulator {
 
     private func handleKey(_ char: String) {
         if !isHintModeActive {
-            if char == "f" {
-                activateHintMode()
+            switch char {
+            case "f": activateHintMode()
+            case "j": ScrollController.scroll(direction: .down)
+            case "k": ScrollController.scroll(direction: .up)
+            case "h": ScrollController.scroll(direction: .left)
+            case "l": ScrollController.scroll(direction: .right)
+            default: break
             }
             return
         }
