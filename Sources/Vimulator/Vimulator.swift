@@ -7,6 +7,7 @@ public final class Vimulator {
 
   public var style: HintLabelStyle = .vimium
   public var overlayEffect: HintOverlayEffect = .none
+  public var appearAnimation: HintAppearAnimation = .fade()
 
   private let overlay = HintOverlay()
   private var isHintModeActive = false
@@ -88,7 +89,7 @@ public final class Vimulator {
 
     isHintModeActive = true
     typedChars = ""
-    overlay.show(hints: currentHints, style: style, overlayEffect: overlayEffect, in: window)
+    overlay.show(hints: currentHints, style: style, overlayEffect: overlayEffect, animation: appearAnimation, in: window)
   }
 
   private func deactivateHintMode() {

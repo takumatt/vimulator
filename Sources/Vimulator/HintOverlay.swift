@@ -5,7 +5,7 @@ final class HintOverlay {
   private var window: UIWindow?
   private var labels: [String: HintLabel] = [:]  // hint string → label
 
-  func show(hints: [HintTarget], style: HintLabelStyle, overlayEffect: HintOverlayEffect, in keyWindow: UIWindow) {
+  func show(hints: [HintTarget], style: HintLabelStyle, overlayEffect: HintOverlayEffect, animation: HintAppearAnimation, in keyWindow: UIWindow) {
     let overlayWindow = makeWindow(over: keyWindow)
     window = overlayWindow
 
@@ -40,7 +40,16 @@ final class HintOverlay {
       labels[target.hint] = label
     }
 
-    overlayWindow.isHidden = false
+    switch animation {
+    case .none:
+      overlayWindow.isHidden = false
+    case .fade(let duration):
+      overlayWindow.alpha = 0
+      overlayWindow.isHidden = false
+      UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut) {
+        overlayWindow.alpha = 1
+      }
+    }
   }
 
   func highlight(matching prefix: String) {
