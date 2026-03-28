@@ -62,11 +62,14 @@ enum ScrollController {
     }
 
     private static func clamped(_ offset: CGPoint, in sv: UIScrollView) -> CGPoint {
-        let maxX = max(0, sv.contentSize.width - sv.bounds.width + sv.contentInset.right)
-        let maxY = max(0, sv.contentSize.height - sv.bounds.height + sv.contentInset.bottom)
+        let inset = sv.adjustedContentInset
+        let minX = -inset.left
+        let minY = -inset.top
+        let maxX = max(minX, sv.contentSize.width  - sv.bounds.width  + inset.right)
+        let maxY = max(minY, sv.contentSize.height - sv.bounds.height + inset.bottom)
         return CGPoint(
-            x: min(max(-sv.contentInset.left, offset.x), maxX),
-            y: min(max(-sv.contentInset.top, offset.y), maxY)
+            x: min(max(minX, offset.x), maxX),
+            y: min(max(minY, offset.y), maxY)
         )
     }
 
