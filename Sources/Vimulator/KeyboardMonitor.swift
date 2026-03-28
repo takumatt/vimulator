@@ -13,8 +13,13 @@ final class KeyboardMonitor {
 
     private func swizzleSendEvent() {
         let cls = UIApplication.self
-        let original = class_getInstanceMethod(cls, #selector(UIApplication.sendEvent(_:)))!
-        let swizzled = class_getInstanceMethod(cls, #selector(UIApplication.vim_sendEvent(_:)))!
+        guard
+            let original = class_getInstanceMethod(cls, #selector(UIApplication.sendEvent(_:))),
+            let swizzled = class_getInstanceMethod(cls, #selector(UIApplication.vim_sendEvent(_:)))
+        else {
+            assertionFailure("[Vimulator] Failed to swizzle UIApplication.sendEvent")
+            return
+        }
         method_exchangeImplementations(original, swizzled)
     }
 }
