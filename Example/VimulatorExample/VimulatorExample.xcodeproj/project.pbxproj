@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		C4F7E4542F785E43009316FF /* Vimulator in Frameworks */ = {isa = PBXBuildFile; productRef = C4F7E4532F785E43009316FF /* Vimulator */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		C4F7E4352F785DE3009316FF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C4F7E4542F785E43009316FF /* Vimulator in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +83,7 @@
 				C4F7E4292F785DE2009316FF /* VimulatorExample */,
 				C4F7E4372F785DE3009316FF /* VimulatorExampleTests */,
 				C4F7E4412F785DE3009316FF /* VimulatorExampleUITests */,
+				C4F7E4522F785E43009316FF /* Frameworks */,
 				C4F7E4282F785DE2009316FF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +96,13 @@
 				C4F7E43E2F785DE3009316FF /* VimulatorExampleUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		C4F7E4522F785E43009316FF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +125,7 @@
 			);
 			name = VimulatorExample;
 			packageProductDependencies = (
+				C4F7E4532F785E43009316FF /* Vimulator */,
 			);
 			productName = VimulatorExample;
 			productReference = C4F7E4272F785DE2009316FF /* VimulatorExample.app */;
@@ -195,6 +209,9 @@
 			);
 			mainGroup = C4F7E41E2F785DE2009316FF;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C4F7E4512F785E30009316FF /* XCLocalSwiftPackageReference "../../../vimulator" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C4F7E4282F785DE2009316FF /* Products */;
 			projectDirPath = "";
@@ -570,6 +587,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		C4F7E4512F785E30009316FF /* XCLocalSwiftPackageReference "../../../vimulator" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../../vimulator;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C4F7E4532F785E43009316FF /* Vimulator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C4F7E4512F785E30009316FF /* XCLocalSwiftPackageReference "../../../vimulator" */;
+			productName = Vimulator;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C4F7E41F2F785DE2009316FF /* Project object */;
 }

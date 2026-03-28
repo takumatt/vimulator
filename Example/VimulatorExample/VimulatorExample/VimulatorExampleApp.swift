@@ -6,9 +6,14 @@
 //
 
 import SwiftUI
+import Vimulator
 
 @main
 struct VimulatorExampleApp: App {
+    init() {
+        Vimulator.shared.install()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
