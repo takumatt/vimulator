@@ -87,6 +87,7 @@ Set properties before calling `install()`:
 Vimulator.shared.style = .dark
 Vimulator.shared.overlayEffect = .blur()
 Vimulator.shared.appearAnimation = .fade(duration: 0.2)
+Vimulator.shared.hintKey = "f"  // default
 Vimulator.shared.install()
 ```
 

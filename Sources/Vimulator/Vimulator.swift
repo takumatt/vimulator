@@ -8,6 +8,7 @@ public final class Vimulator {
   public var style: HintLabelStyle = .vimium
   public var overlayEffect: HintOverlayEffect = .none
   public var appearAnimation: HintAppearAnimation = .fade()
+  public var hintKey: String = "f"
 
   private let overlay = HintOverlay()
   private var isHintModeActive = false
@@ -37,7 +38,7 @@ public final class Vimulator {
         return
       }
       switch char {
-      case "f": activateHintMode()
+      case hintKey: activateHintMode()
       case "g":
         let now = Date().timeIntervalSinceReferenceDate
         if now - lastGTime <= ggInterval {
