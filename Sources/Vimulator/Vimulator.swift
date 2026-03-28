@@ -42,7 +42,7 @@ public final class Vimulator {
         }
 
         if matches.count == 1 && matches[0].hint == typedChars {
-            matches[0].element.accessibilityActivate()
+            matches[0].activate()
             deactivateHintMode()
             return
         }
@@ -58,7 +58,7 @@ public final class Vimulator {
 
         let elements = AccessibilityScanner.scan(in: window)
         let hints = HintGenerator.generate(count: elements.count)
-        currentHints = zip(elements, hints).map { HintTarget(element: $0.0, hint: $0.1) }
+        currentHints = zip(elements, hints).map { HintTarget(element: $0, hint: $1) }
 
         isHintModeActive = true
         typedChars = ""
@@ -72,12 +72,4 @@ public final class Vimulator {
         overlay.hide()
     }
 }
-
-struct HintTarget {
-    let element: UIAccessibilityElement_
-    let hint: String
-}
-
-/// Protocol-like alias so we can work with both UIView and UIAccessibilityElement
-typealias UIAccessibilityElement_ = NSObject
 #endif
