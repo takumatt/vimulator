@@ -2,7 +2,7 @@
 
 Vimium-style keyboard navigation for iOS Simulator.
 
-<video src="assets/demo.mp4" autoplay loop muted width="300"></video>
+https://github.com/user-attachments/assets/b985b59f-4716-4ca1-86e7-ed688514416d
 
 <img src="assets/screenshot.png" width="300" />
 
