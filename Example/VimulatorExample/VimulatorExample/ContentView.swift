@@ -62,7 +62,7 @@ struct ButtonsTab: View {
 // MARK: - List Tab
 
 struct ListTab: View {
-    @State private var items = (1...8).map { "Item \($0)" }
+    @State private var items = (1...30).map { "Item \($0)" }
     @State private var selected: String?
 
     var body: some View {
