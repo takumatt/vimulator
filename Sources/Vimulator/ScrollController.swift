@@ -1,14 +1,55 @@
 #if targetEnvironment(simulator)
 import UIKit
 
-enum ScrollController {
-    static let step: CGFloat = 120
+final class ScrollController {
+    static let shared = ScrollController()
 
-    static func scroll(direction: Direction) {
-        guard let scrollView = findScrollView() else { return }
+    /// Points per second when holding a scroll key.
+    private let velocity: CGFloat = 600
+
+    private var displayLink: CADisplayLink?
+    private var direction: Direction?
+    private var lastTimestamp: CFTimeInterval = 0
+
+    private init() {}
+
+    enum Direction { case up, down, left, right }
+
+    // MARK: - Public
+
+    func start(direction: Direction) {
+        stop()
+        self.direction = direction
+        let link = CADisplayLink(target: self, selector: #selector(tick(_:)))
+        link.add(to: .main, forMode: .common)
+        displayLink = link
+    }
+
+    func stop() {
+        displayLink?.invalidate()
+        displayLink = nil
+        direction = nil
+        lastTimestamp = 0
+    }
+
+    // MARK: - Private
+
+    @objc private func tick(_ link: CADisplayLink) {
+        guard let direction else { return }
+
+        let dt: CGFloat
+        if lastTimestamp == 0 {
+            dt = 0
+        } else {
+            dt = link.timestamp - lastTimestamp
+        }
+        lastTimestamp = link.timestamp
+
+        guard dt > 0, let scrollView = findScrollView() else { return }
+
+        let step = velocity * dt
         let offset = scrollView.contentOffset
         let new: CGPoint
-
         switch direction {
         case .down:  new = CGPoint(x: offset.x, y: offset.y + step)
         case .up:    new = CGPoint(x: offset.x, y: offset.y - step)
@@ -16,18 +57,12 @@ enum ScrollController {
         case .left:  new = CGPoint(x: offset.x - step, y: offset.y)
         }
 
-        scrollView.setContentOffset(clamped(new, in: scrollView), animated: true)
+        scrollView.setContentOffset(clamped(new, in: scrollView), animated: false)
     }
 
-    enum Direction { case up, down, left, right }
+    // MARK: - Scroll view discovery
 
-    // MARK: - Private
-
-    /// Find the most relevant scroll view:
-    /// 1. Walk up from the first responder
-    /// 2. Fall back to hit-testing the screen center
-    /// 3. Fall back to the deepest scroll view in the window
-    private static func findScrollView() -> UIScrollView? {
+    private func findScrollView() -> UIScrollView? {
         guard let window = keyWindow() else { return nil }
 
         if let responder = UIResponder.currentFirstResponder as? UIView,
@@ -44,7 +79,7 @@ enum ScrollController {
         return deepestScrollView(in: window)
     }
 
-    private static func firstScrollView(from view: UIView) -> UIScrollView? {
+    private func firstScrollView(from view: UIView) -> UIScrollView? {
         var v: UIView? = view
         while let current = v {
             if let sv = current as? UIScrollView, sv.isScrollEnabled { return sv }
@@ -53,7 +88,7 @@ enum ScrollController {
         return nil
     }
 
-    private static func deepestScrollView(in view: UIView) -> UIScrollView? {
+    private func deepestScrollView(in view: UIView) -> UIScrollView? {
         for subview in view.subviews.reversed() {
             if let found = deepestScrollView(in: subview) { return found }
         }
@@ -61,7 +96,7 @@ enum ScrollController {
         return nil
     }
 
-    private static func clamped(_ offset: CGPoint, in sv: UIScrollView) -> CGPoint {
+    private func clamped(_ offset: CGPoint, in sv: UIScrollView) -> CGPoint {
         let inset = sv.adjustedContentInset
         let minX = -inset.left
         let minY = -inset.top
@@ -73,7 +108,7 @@ enum ScrollController {
         )
     }
 
-    private static func keyWindow() -> UIWindow? {
+    private func keyWindow() -> UIWindow? {
         UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
             .flatMap { $0.windows }

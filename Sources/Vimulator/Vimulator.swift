@@ -10,11 +10,6 @@ public final class Vimulator {
     private var typedChars = ""
     private var currentHints: [HintTarget] = []
 
-    // Scroll repeat: fire after 200ms initial delay, then every 50ms
-    private var scrollTimer: Timer?
-    private let scrollInitialDelay: TimeInterval = 0.2
-    private let scrollRepeatInterval: TimeInterval = 0.05
-
     private init() {}
 
     /// Install Vimulator. Must be called after the key window is ready.
@@ -30,8 +25,7 @@ public final class Vimulator {
     private func handleKey(_ char: String) {
         if !isHintModeActive {
             if let direction = scrollDirection(for: char) {
-                ScrollController.scroll(direction: direction)
-                startScrollRepeat(direction: direction)
+                ScrollController.shared.start(direction: direction)
                 return
             }
             if char == "f" { activateHintMode() }
@@ -63,11 +57,9 @@ public final class Vimulator {
 
     private func handleKeyUp(_ char: String) {
         if scrollDirection(for: char) != nil {
-            stopScrollRepeat()
+            ScrollController.shared.stop()
         }
     }
-
-    // MARK: - Scroll repeat
 
     private func scrollDirection(for char: String) -> ScrollController.Direction? {
         switch char {
@@ -77,20 +69,6 @@ public final class Vimulator {
         case "l": return .right
         default:  return nil
         }
-    }
-
-    private func startScrollRepeat(direction: ScrollController.Direction) {
-        stopScrollRepeat()
-        scrollTimer = Timer.scheduledTimer(withTimeInterval: scrollInitialDelay, repeats: false) { [weak self] _ in
-            self?.scrollTimer = Timer.scheduledTimer(withTimeInterval: self?.scrollRepeatInterval ?? 0.05, repeats: true) { _ in
-                ScrollController.scroll(direction: direction)
-            }
-        }
-    }
-
-    private func stopScrollRepeat() {
-        scrollTimer?.invalidate()
-        scrollTimer = nil
     }
 
     // MARK: - Hint mode
