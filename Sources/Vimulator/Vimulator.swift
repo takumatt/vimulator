@@ -10,6 +10,11 @@ public final class Vimulator {
     private var typedChars = ""
     private var currentHints: [HintTarget] = []
 
+    // Scroll repeat: fire after 200ms initial delay, then every 50ms
+    private var scrollTimer: Timer?
+    private let scrollInitialDelay: TimeInterval = 0.2
+    private let scrollRepeatInterval: TimeInterval = 0.05
+
     private init() {}
 
     /// Install Vimulator. Must be called after the key window is ready.
@@ -17,18 +22,19 @@ public final class Vimulator {
         KeyboardMonitor.shared.onKeyDown = { [weak self] char in
             self?.handleKey(char)
         }
+        KeyboardMonitor.shared.onKeyUp = { [weak self] char in
+            self?.handleKeyUp(char)
+        }
     }
 
     private func handleKey(_ char: String) {
         if !isHintModeActive {
-            switch char {
-            case "f": activateHintMode()
-            case "j": ScrollController.scroll(direction: .down)
-            case "k": ScrollController.scroll(direction: .up)
-            case "h": ScrollController.scroll(direction: .left)
-            case "l": ScrollController.scroll(direction: .right)
-            default: break
+            if let direction = scrollDirection(for: char) {
+                ScrollController.scroll(direction: direction)
+                startScrollRepeat(direction: direction)
+                return
             }
+            if char == "f" { activateHintMode() }
             return
         }
 
@@ -54,6 +60,40 @@ public final class Vimulator {
 
         overlay.highlight(matching: typedChars)
     }
+
+    private func handleKeyUp(_ char: String) {
+        if scrollDirection(for: char) != nil {
+            stopScrollRepeat()
+        }
+    }
+
+    // MARK: - Scroll repeat
+
+    private func scrollDirection(for char: String) -> ScrollController.Direction? {
+        switch char {
+        case "j": return .down
+        case "k": return .up
+        case "h": return .left
+        case "l": return .right
+        default:  return nil
+        }
+    }
+
+    private func startScrollRepeat(direction: ScrollController.Direction) {
+        stopScrollRepeat()
+        scrollTimer = Timer.scheduledTimer(withTimeInterval: scrollInitialDelay, repeats: false) { [weak self] _ in
+            self?.scrollTimer = Timer.scheduledTimer(withTimeInterval: self?.scrollRepeatInterval ?? 0.05, repeats: true) { _ in
+                ScrollController.scroll(direction: direction)
+            }
+        }
+    }
+
+    private func stopScrollRepeat() {
+        scrollTimer?.invalidate()
+        scrollTimer = nil
+    }
+
+    // MARK: - Hint mode
 
     private func activateHintMode() {
         guard let window = UIApplication.shared.connectedScenes

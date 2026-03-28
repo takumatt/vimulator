@@ -5,6 +5,7 @@ import UIKit
 final class KeyboardMonitor {
     static let shared = KeyboardMonitor()
     var onKeyDown: ((String) -> Void)?
+    var onKeyUp: ((String) -> Void)?
 
     private init() {
         swizzleSendEvent()
@@ -35,11 +36,15 @@ extension UIApplication {
             return
         }
 
-        for press in pressesEvent.allPresses where press.phase == .began {
+        for press in pressesEvent.allPresses {
             guard let key = press.key else { continue }
             let char = key.characters
             guard !char.isEmpty else { continue }
-            KeyboardMonitor.shared.onKeyDown?(char)
+            switch press.phase {
+            case .began:    KeyboardMonitor.shared.onKeyDown?(char)
+            case .ended, .cancelled: KeyboardMonitor.shared.onKeyUp?(char)
+            default: break
+            }
         }
     }
 }
