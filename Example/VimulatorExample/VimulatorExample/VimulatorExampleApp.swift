@@ -10,14 +10,14 @@ import Vimulator
 
 @main
 struct VimulatorExampleApp: App {
-    init() {
-        Vimulator.shared.style = .dark
-        Vimulator.shared.install()
-    }
+  init() {
+    Vimulator.shared.overlayEffect = .blur()
+    Vimulator.shared.install()
+  }
 
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
+  var body: some Scene {
+    WindowGroup {
+      ContentView()
     }
+  }
 }
