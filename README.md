@@ -77,6 +77,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 ```
 
+## Styling
+
+Set `Vimulator.shared.style` before calling `install()`:
+
+```swift
+Vimulator.shared.style = .dark
+Vimulator.shared.install()
+```
+
+| Preset | Description |
+|--------|-------------|
+| `.vimium` | Classic yellow badge (default) |
+| `.modern` | Frosted glass with large corner radius |
+| `.simple` | Minimal outline-only badge |
+| `.dark` | Dark badge for light-colored UIs |
+| `.accent` | System tint color |
+
+Or build your own:
+
+```swift
+Vimulator.shared.style = HintLabelStyle(
+    backgroundColor: .systemPurple.withAlphaComponent(0.9),
+    cornerRadius: 6,
+    textColor: .white,
+    matchedPrefixColor: .yellow,
+    font: .monospacedSystemFont(ofSize: 12, weight: .bold),
+    padding: 4
+)
+```
+
 ## How it works
 
 - **Keyboard monitoring** — swizzles `UIApplication.sendEvent` to intercept hardware key events globally
