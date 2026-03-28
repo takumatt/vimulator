@@ -77,14 +77,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 ```
 
-## Styling
+## Customization
 
-Set `Vimulator.shared.style` before calling `install()`:
+Set properties before calling `install()`:
 
 ```swift
 Vimulator.shared.style = .dark
+Vimulator.shared.overlayEffect = .blur()
+Vimulator.shared.appearAnimation = .fade(duration: 0.2)
 Vimulator.shared.install()
 ```
+
+### Hint label style
 
 | Preset | Description |
 |--------|-------------|
@@ -98,13 +102,31 @@ Or build your own:
 
 ```swift
 Vimulator.shared.style = HintLabelStyle(
-    backgroundColor: .systemPurple.withAlphaComponent(0.9),
-    cornerRadius: 6,
-    textColor: .white,
-    matchedPrefixColor: .yellow,
-    font: .monospacedSystemFont(ofSize: 12, weight: .bold),
-    padding: 4
+  backgroundColor: .systemPurple.withAlphaComponent(0.9),
+  cornerRadius: 6,
+  textColor: .white,
+  matchedPrefixColor: .yellow,
+  font: .monospacedSystemFont(ofSize: 12, weight: .bold),
+  padding: 4
 )
+```
+
+### Overlay effect
+
+```swift
+Vimulator.shared.overlayEffect = .none                          // default
+Vimulator.shared.overlayEffect = .dim()                        // alpha 0.3
+Vimulator.shared.overlayEffect = .dim(UIColor(white: 0, alpha: 0.5))
+Vimulator.shared.overlayEffect = .blur()                       // opacity 0.7
+Vimulator.shared.overlayEffect = .blur(style: .systemMaterial, opacity: 0.5)
+```
+
+### Appear animation
+
+```swift
+Vimulator.shared.appearAnimation = .none
+Vimulator.shared.appearAnimation = .fade()           // 0.15s (default)
+Vimulator.shared.appearAnimation = .fade(duration: 0.3)
 ```
 
 ## How it works
