@@ -17,6 +17,20 @@ final class ScrollController {
 
   // MARK: - Public
 
+  func scrollToTop() {
+    guard let sv = findScrollView() else { return }
+    let top = CGPoint(x: sv.contentOffset.x, y: -sv.adjustedContentInset.top)
+    sv.setContentOffset(top, animated: true)
+  }
+
+  func scrollToBottom() {
+    guard let sv = findScrollView() else { return }
+    let inset = sv.adjustedContentInset
+    let maxY = sv.contentSize.height - sv.bounds.height + inset.bottom
+    let bottom = CGPoint(x: sv.contentOffset.x, y: max(-inset.top, maxY))
+    sv.setContentOffset(bottom, animated: true)
+  }
+
   func start(direction: Direction) {
     stop()
     self.direction = direction

@@ -14,6 +14,10 @@ public final class Vimulator {
   private var typedChars = ""
   private var currentHints: [HintTarget] = []
 
+  // gg detection
+  private var lastGTime: TimeInterval = 0
+  private let ggInterval: TimeInterval = 0.4
+
   private init() {}
 
   /// Install Vimulator. Must be called after the key window is ready.
@@ -32,7 +36,19 @@ public final class Vimulator {
         ScrollController.shared.start(direction: direction)
         return
       }
-      if char == "f" { activateHintMode() }
+      switch char {
+      case "f": activateHintMode()
+      case "g":
+        let now = Date().timeIntervalSinceReferenceDate
+        if now - lastGTime <= ggInterval {
+          ScrollController.shared.scrollToTop()
+          lastGTime = 0
+        } else {
+          lastGTime = now
+        }
+      case "G": ScrollController.shared.scrollToBottom()
+      default: break
+      }
       return
     }
 

@@ -11,7 +11,7 @@ import Vimulator
 @main
 struct VimulatorExampleApp: App {
   init() {
-    Vimulator.shared.overlayEffect = .blur()
+    Vimulator.shared.style = .dark
     Vimulator.shared.install()
   }
 
