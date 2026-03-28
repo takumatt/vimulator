@@ -5,7 +5,7 @@ final class HintOverlay {
     private var window: UIWindow?
     private var labels: [String: HintLabel] = [:]  // hint string → label
 
-    func show(hints: [HintTarget], in keyWindow: UIWindow) {
+    func show(hints: [HintTarget], style: HintLabelStyle, in keyWindow: UIWindow) {
         let overlayWindow = makeWindow(over: keyWindow)
         window = overlayWindow
 
@@ -17,7 +17,7 @@ final class HintOverlay {
         labels = [:]
         for target in hints {
             guard let frame = target.element.accessibilityFrame(in: overlayWindow) else { continue }
-            let label = HintLabel(hint: target.hint)
+            let label = HintLabel(hint: target.hint, style: style)
             label.center = CGPoint(x: frame.minX + 2, y: frame.midY)
             container.addSubview(label)
             labels[target.hint] = label

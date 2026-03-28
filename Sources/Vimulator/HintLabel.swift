@@ -3,10 +3,13 @@ import UIKit
 
 final class HintLabel: UIView {
     private let label = UILabel()
+    private var blurView: UIVisualEffectView?
     private let hint: String
+    private let style: HintLabelStyle
 
-    init(hint: String) {
+    init(hint: String, style: HintLabelStyle) {
         self.hint = hint
+        self.style = style
         super.init(frame: .zero)
         setup()
     }
@@ -14,35 +17,46 @@ final class HintLabel: UIView {
     required init?(coder: NSCoder) { fatalError() }
 
     private func setup() {
-        backgroundColor = UIColor(red: 1.0, green: 0.96, blue: 0.4, alpha: 0.92)
-        layer.cornerRadius = 3
-        layer.borderWidth = 0.5
-        layer.borderColor = UIColor(white: 0, alpha: 0.25).cgColor
+        layer.cornerRadius = style.cornerRadius
+        layer.borderWidth = style.borderWidth
+        layer.borderColor = style.borderColor.cgColor
+        layer.masksToBounds = true
 
-        label.font = .monospacedSystemFont(ofSize: 11, weight: .bold)
-        label.textColor = .black
+        if style.useBlur {
+            let blur = UIVisualEffectView(effect: UIBlurEffect(style: style.blurStyle))
+            blur.frame = bounds
+            blur.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            addSubview(blur)
+            blurView = blur
+        } else {
+            backgroundColor = style.backgroundColor
+        }
+
+        label.font = style.font
+        label.textColor = style.textColor
         label.text = hint
         label.sizeToFit()
 
-        let padding: CGFloat = 3
-        let size = CGSize(width: label.bounds.width + padding * 2,
-                         height: label.bounds.height + padding * 2)
+        let p = style.padding
+        let size = CGSize(width: label.bounds.width + p * 2, height: label.bounds.height + p * 2)
         bounds = CGRect(origin: .zero, size: size)
         label.center = CGPoint(x: bounds.midX, y: bounds.midY)
         addSubview(label)
+
+        // Re-frame blur after bounds are set
+        blurView?.frame = bounds
     }
 
-    /// Visually separate the already-typed prefix from the remaining chars.
     func setMatched(prefix: String) {
         alpha = 1.0
         let remaining = String(hint.dropFirst(prefix.count))
         let attributed = NSMutableAttributedString(
             string: prefix,
-            attributes: [.foregroundColor: UIColor.systemRed, .font: label.font!]
+            attributes: [.foregroundColor: style.matchedPrefixColor, .font: style.font]
         )
         attributed.append(NSAttributedString(
             string: remaining,
-            attributes: [.foregroundColor: UIColor.black, .font: label.font!]
+            attributes: [.foregroundColor: style.textColor, .font: style.font]
         ))
         label.attributedText = attributed
     }
