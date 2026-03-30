@@ -7,7 +7,7 @@ final class HintOverlay {
 
   enum LabelPosition { case topLeading, center }
 
-  func show(hints: [HintTarget], style: HintLabelStyle, overlayEffect: HintOverlayEffect, animation: HintAppearAnimation, labelPosition: LabelPosition = .topLeading, in keyWindow: UIWindow) {
+  func show(hints: [HintTarget], style: HintLabelStyle, overlayEffect: HintOverlayEffect, animation: HintAppearAnimation, labelPosition: LabelPosition = .topLeading, showAreaHighlight: Bool = false, in keyWindow: UIWindow) {
     let overlayWindow = makeWindow(over: keyWindow)
     window = overlayWindow
 
@@ -36,6 +36,18 @@ final class HintOverlay {
     labels = [:]
     for target in hints {
       guard let frame = target.element.accessibilityFrame(in: overlayWindow) else { continue }
+
+      // Area highlight
+      if showAreaHighlight {
+        let highlight = UIView(frame: frame)
+        highlight.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.15)
+        highlight.layer.borderColor = UIColor.systemBlue.withAlphaComponent(0.5).cgColor
+        highlight.layer.borderWidth = 1.5
+        highlight.layer.cornerRadius = 8
+        highlight.isUserInteractionEnabled = false
+        container.addSubview(highlight)
+      }
+
       let label = HintLabel(hint: target.hint, style: style)
       switch labelPosition {
       case .topLeading:
