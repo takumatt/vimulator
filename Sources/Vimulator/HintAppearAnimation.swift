@@ -3,6 +3,6 @@ import UIKit
 
 public enum HintAppearAnimation {
   case none
-  case fade(duration: TimeInterval = 0.15)
+  case fade(duration: TimeInterval = 0.1)
 }
 #endif
