@@ -43,13 +43,21 @@ extension UIApplication {
 
     for press in pressesEvent.allPresses {
       guard let key = press.key else { continue }
-      let char = key.characters
+      let char = normalizedChar(for: key)
       guard !char.isEmpty else { continue }
       switch press.phase {
       case .began:  KeyboardMonitor.shared.onKeyDown?(char)
       case .ended, .cancelled: KeyboardMonitor.shared.onKeyUp?(char)
       default: break
       }
+    }
+  }
+  private func normalizedChar(for key: UIKey) -> String {
+    switch key.keyCode {
+    case .keyboardEscape:            return "\u{1B}"
+    case .keyboardReturnOrEnter:     return "\r"
+    case .keyboardDeleteOrBackspace: return "\u{7F}"
+    default:                         return key.characters
     }
   }
 }
