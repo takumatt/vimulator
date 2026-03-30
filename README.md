@@ -23,6 +23,8 @@ Vimulator runs **inside your app process**. It talks directly to UIKit with no I
 | `h` / `l` | Scroll left / right |
 | `gg` | Scroll to top |
 | `G` | Scroll to bottom |
+| `F` | Select a scroll view to lock `hjkl` to |
+| `Escape` | Exit hint mode / dismiss keyboard / release scroll lock |
 
 Holding a scroll key scrolls continuously at 600 pt/sec.
 
