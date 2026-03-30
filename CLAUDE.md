@@ -16,6 +16,19 @@ Verify README is up to date before committing.
 - Commit messages in English
 - Never commit `xcuserdata/`, `*.xcuserstate`, or `.DS_Store`
 
+## Testing
+
+Run tests on the iOS simulator via xcodebuild (not `swift test` — UIKit requires the simulator):
+
+```sh
+xcodebuild test \
+  -scheme Vimulator \
+  -destination 'platform=iOS Simulator,name=iPhone 16'
+```
+
+- Performance baselines are in `measure {}` blocks — compare before/after when changing scanner or overlay code
+- Tests use plain `UIView` with explicit accessibility traits instead of `UIButton`, because `UIButton.isAccessibilityElement` returns false outside a window in iOS 26
+
 ## Code style
 
 - 2-space indentation
