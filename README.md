@@ -18,13 +18,14 @@ Vimulator runs **inside your app process**. It talks directly to UIKit with no I
 |-----|--------|
 | `f` | Enter hint mode — labels appear on every interactive element |
 | hint chars | Activate the matched element |
-| `Escape` | Exit hint mode / dismiss keyboard |
+| `/` | Enter search mode — type to filter elements by accessibility label |
+| `Enter` | Activate the first search match |
+| `Escape` | Exit hint / search mode / dismiss keyboard / release scroll lock |
 | `j` / `k` | Scroll down / up |
 | `h` / `l` | Scroll left / right |
 | `gg` | Scroll to top |
 | `G` | Scroll to bottom |
 | `F` | Select a scroll view to lock `hjkl` to |
-| `Escape` | Exit hint mode / dismiss keyboard / release scroll lock |
 
 Holding a scroll key scrolls continuously at 600 pt/sec.
 

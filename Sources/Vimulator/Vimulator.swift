@@ -11,6 +11,8 @@ public final class Vimulator {
   public var hintKey: String = "f"
 
   private let overlay = HintOverlay()
+  private let searchBar = SearchBar()
+  private var searchBarWindow: UIWindow?
   private var mode: Mode = .normal
   private var typedChars = ""
   private var currentHints: [HintTarget] = []
@@ -23,6 +25,7 @@ public final class Vimulator {
     case normal
     case hint       // f → element activation
     case scrollHint // F → scroll view selection
+    case search     // / → filter by accessibility label
   }
 
   private init() {}
@@ -45,6 +48,8 @@ public final class Vimulator {
       handleHintKey(char)
     case .scrollHint:
       handleScrollHintKey(char)
+    case .search:
+      handleSearchKey(char)
     }
   }
 
@@ -58,6 +63,7 @@ public final class Vimulator {
     switch char {
     case hintKey:  activateHintMode()
     case "F":      activateScrollHintMode()
+    case "/":      activateSearchMode()
     case "g":
       let now = Date().timeIntervalSinceReferenceDate
       if now - lastGTime <= ggInterval {
@@ -174,6 +180,93 @@ public final class Vimulator {
     typedChars = ""
     currentHints = []
     overlay.hide()
+  }
+
+  // MARK: - Search mode
+
+  private func handleSearchKey(_ char: String) {
+    switch char {
+    case "\u{1B}":
+      deactivateSearchMode()
+    case "\r", "\n":
+      // Enter: activate first match
+      let query = typedChars
+      let matches = currentHints.filter { matchesQuery($0, query: query) }
+      if let first = matches.first {
+        first.activate()
+      }
+      deactivateSearchMode()
+    case "\u{7F}":
+      // Backspace
+      if !typedChars.isEmpty {
+        typedChars.removeLast()
+      }
+      applySearchFilter()
+      searchBar.update(query: typedChars)
+    default:
+      typedChars += char
+      applySearchFilter()
+      searchBar.update(query: typedChars)
+    }
+  }
+
+  private func matchesQuery(_ target: HintTarget, query: String) -> Bool {
+    guard !query.isEmpty else { return true }
+    return target.element.accessibilityLabel?.localizedCaseInsensitiveContains(query) == true
+  }
+
+  private func applySearchFilter() {
+    let query = typedChars
+    let matches = currentHints.filter { matchesQuery($0, query: query) }
+    let visibleHints = Set(matches.map { $0.hint })
+    overlay.filterByHints(visibleHints)
+
+    if matches.count == 1 {
+      matches[0].activate()
+      deactivateSearchMode()
+    }
+  }
+
+  private func activateSearchMode() {
+    guard let window = keyWindow() else { return }
+    let elements = AccessibilityScanner.scan(in: window)
+    let hints = HintGenerator.generate(count: elements.count)
+    currentHints = zip(elements, hints).map { HintTarget(element: $0, hint: $1) }
+    mode = .search
+    typedChars = ""
+
+    overlay.show(hints: currentHints, config: .forElements(style: style, overlayEffect: overlayEffect, animation: appearAnimation), in: window)
+
+    // Show search bar in a floating window
+    let barHeight: CGFloat = 52
+    let barMargin: CGFloat = 16
+    let barWidth = window.bounds.width - barMargin * 2
+    let barY = window.bounds.height - window.safeAreaInsets.bottom - barHeight - barMargin
+    searchBar.frame = CGRect(x: barMargin, y: barY, width: barWidth, height: barHeight)
+    searchBar.update(query: "")
+
+    let w: UIWindow
+    if let scene = window.windowScene {
+      w = UIWindow(windowScene: scene)
+    } else {
+      w = UIWindow(frame: window.bounds)
+    }
+    w.windowLevel = window.windowLevel + 2
+    w.isUserInteractionEnabled = false
+    w.backgroundColor = .clear
+    w.addSubview(searchBar)
+    w.isHidden = false
+    searchBarWindow = w
+  }
+
+  private func deactivateSearchMode() {
+    mode = .normal
+    typedChars = ""
+    currentHints = []
+    overlay.hide()
+    searchBarWindow?.isHidden = true
+    searchBarWindow?.subviews.forEach { $0.removeFromSuperview() }
+    searchBarWindow = nil
   }
 
   // MARK: - Helpers

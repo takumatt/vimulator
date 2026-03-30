@@ -86,6 +86,13 @@ final class HintOverlay {
     }
   }
 
+  /// Show only hints whose keys are in `visibleHints`, hide the rest.
+  func filterByHints(_ visibleHints: Set<String>) {
+    for (hint, label) in labels {
+      label.alpha = visibleHints.contains(hint) ? 1.0 : 0.0
+    }
+  }
+
   func hide() {
     window?.isHidden = true
     window?.subviews.forEach { $0.removeFromSuperview() }
