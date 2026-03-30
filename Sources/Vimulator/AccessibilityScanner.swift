@@ -9,7 +9,14 @@ enum AccessibilityScanner {
   }
 
   private static func walk(_ node: NSObject, into results: inout [NSObject]) {
-    // If the node exposes custom accessibility children, recurse into those
+    // If the node is itself interactive, collect it without recursing further
+    if node.isAccessibilityElement && isInteractive(node) {
+      results.append(node)
+      return
+    }
+
+    // If the node exposes custom accessibility children (e.g. SwiftUI containers),
+    // recurse into those
     if let children = node.accessibilityElements as? [NSObject], !children.isEmpty {
       for child in children {
         walk(child, into: &results)
@@ -17,11 +24,8 @@ enum AccessibilityScanner {
       return
     }
 
-    // Leaf: if interactive, collect it
+    // Non-interactive accessibility element (e.g. label, image): skip
     if node.isAccessibilityElement {
-      if isInteractive(node) {
-        results.append(node)
-      }
       return
     }
 
