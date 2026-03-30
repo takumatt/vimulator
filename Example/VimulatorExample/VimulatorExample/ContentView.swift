@@ -16,6 +16,10 @@ struct ContentView: View {
         .tabItem { Label("List", systemImage: "list.bullet") }
       FormTab()
         .tabItem { Label("Form", systemImage: "slider.horizontal.3") }
+      NestedScrollTab()
+        .tabItem { Label("Scroll", systemImage: "rectangle.split.2x2") }
+      PagingTab()
+        .tabItem { Label("Paging", systemImage: "rectangle.on.rectangle") }
     }
   }
 }
@@ -103,6 +107,74 @@ struct FormTab: View {
         }
       }
       .navigationTitle("Form")
+    }
+  }
+}
+
+// MARK: - Nested Scroll Tab
+
+struct NestedScrollTab: View {
+  private let sections = (1...8).map { "Section \($0)" }
+  private let carouselItems = (1...12).map { "Card \($0)" }
+
+  var body: some View {
+    NavigationStack {
+      ScrollView(.vertical) {
+        VStack(alignment: .leading, spacing: 24) {
+          ForEach(sections, id: \.self) { section in
+            VStack(alignment: .leading, spacing: 8) {
+              Text(section)
+                .font(.headline)
+                .padding(.horizontal)
+
+              // Horizontal carousel inside vertical scroll
+              ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                  ForEach(carouselItems, id: \.self) { item in
+                    Button(item) {}
+                      .frame(width: 100, height: 80)
+                      .background(Color.blue.opacity(0.15), in: RoundedRectangle(cornerRadius: 10))
+                  }
+                }
+                .padding(.horizontal)
+              }
+            }
+          }
+        }
+        .padding(.vertical)
+      }
+      .navigationTitle("Nested Scroll")
+    }
+  }
+}
+
+// MARK: - Paging Tab
+
+struct PagingTab: View {
+  private let pages = ["Page 1", "Page 2", "Page 3", "Page 4"]
+
+  var body: some View {
+    NavigationStack {
+      TabView {
+        ForEach(pages, id: \.self) { page in
+          ScrollView(.vertical) {
+            VStack(spacing: 16) {
+              Text(page).font(.title2).bold()
+              ForEach(1...15, id: \.self) { i in
+                Button("\(page) — Item \(i)") {}
+                  .frame(maxWidth: .infinity)
+                  .padding()
+                  .background(Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+              }
+            }
+            .padding()
+          }
+          .tag(page)
+        }
+      }
+      .tabViewStyle(.page)
+      .indexViewStyle(.page(backgroundDisplayMode: .always))
+      .navigationTitle("Paging")
     }
   }
 }
