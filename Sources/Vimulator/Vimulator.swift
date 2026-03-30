@@ -166,7 +166,7 @@ public final class Vimulator {
     currentHints = zip(scrollViews, hints).map { HintTarget(element: $0, hint: $1) }
     mode = .scrollHint
     typedChars = ""
-    overlay.show(hints: currentHints, style: style, overlayEffect: overlayEffect, animation: appearAnimation, in: window)
+    overlay.show(hints: currentHints, style: style, overlayEffect: overlayEffect, animation: appearAnimation, labelPosition: .center, in: window)
   }
 
   private func deactivateScrollHintMode() {
