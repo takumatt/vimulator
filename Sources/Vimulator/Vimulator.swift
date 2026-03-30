@@ -11,13 +11,19 @@ public final class Vimulator {
   public var hintKey: String = "f"
 
   private let overlay = HintOverlay()
-  private var isHintModeActive = false
+  private var mode: Mode = .normal
   private var typedChars = ""
   private var currentHints: [HintTarget] = []
 
   // gg detection
   private var lastGTime: TimeInterval = 0
   private let ggInterval: TimeInterval = 0.4
+
+  private enum Mode {
+    case normal
+    case hint       // f → element activation
+    case scrollHint // F → scroll view selection
+  }
 
   private init() {}
 
@@ -32,48 +38,39 @@ public final class Vimulator {
   }
 
   private func handleKey(_ char: String) {
-    if !isHintModeActive {
-      if let direction = scrollDirection(for: char) {
-        ScrollController.shared.start(direction: direction)
-        return
+    switch mode {
+    case .normal:
+      handleNormalKey(char)
+    case .hint:
+      handleHintKey(char)
+    case .scrollHint:
+      handleScrollHintKey(char)
+    }
+  }
+
+  // MARK: - Normal mode
+
+  private func handleNormalKey(_ char: String) {
+    if let direction = scrollDirection(for: char) {
+      ScrollController.shared.start(direction: direction)
+      return
+    }
+    switch char {
+    case hintKey:  activateHintMode()
+    case "F":      activateScrollHintMode()
+    case "g":
+      let now = Date().timeIntervalSinceReferenceDate
+      if now - lastGTime <= ggInterval {
+        ScrollController.shared.scrollToTop()
+        lastGTime = 0
+      } else {
+        lastGTime = now
       }
-      switch char {
-      case hintKey: activateHintMode()
-      case "g":
-        let now = Date().timeIntervalSinceReferenceDate
-        if now - lastGTime <= ggInterval {
-          ScrollController.shared.scrollToTop()
-          lastGTime = 0
-        } else {
-          lastGTime = now
-        }
-      case "G": ScrollController.shared.scrollToBottom()
-      default: break
-      }
-      return
+    case "G": ScrollController.shared.scrollToBottom()
+    case "\u{1B}": // Escape releases scroll lock
+      ScrollController.shared.unlock()
+    default: break
     }
-
-    if char == "\u{1B}" { // Escape
-      deactivateHintMode()
-      return
-    }
-
-    typedChars += char.lowercased()
-
-    let matches = currentHints.filter { $0.hint.hasPrefix(typedChars) }
-
-    if matches.isEmpty {
-      deactivateHintMode()
-      return
-    }
-
-    if matches.count == 1 && matches[0].hint == typedChars {
-      matches[0].activate()
-      deactivateHintMode()
-      return
-    }
-
-    overlay.highlight(matching: typedChars)
   }
 
   private func handleKeyUp(_ char: String) {
@@ -92,28 +89,100 @@ public final class Vimulator {
     }
   }
 
-  // MARK: - Hint mode
+  // MARK: - Element hint mode
+
+  private func handleHintKey(_ char: String) {
+    if char == "\u{1B}" {
+      deactivateHintMode()
+      return
+    }
+
+    typedChars += char.lowercased()
+    let matches = currentHints.filter { $0.hint.hasPrefix(typedChars) }
+
+    if matches.isEmpty {
+      deactivateHintMode()
+      return
+    }
+
+    if matches.count == 1 && matches[0].hint == typedChars {
+      matches[0].activate()
+      deactivateHintMode()
+      return
+    }
+
+    overlay.highlight(matching: typedChars)
+  }
 
   private func activateHintMode() {
-    guard let window = UIApplication.shared.connectedScenes
-      .compactMap({ $0 as? UIWindowScene })
-      .flatMap({ $0.windows })
-      .last(where: { $0.isKeyWindow }) else { return }
-
+    guard let window = keyWindow() else { return }
     let elements = AccessibilityScanner.scan(in: window)
     let hints = HintGenerator.generate(count: elements.count)
     currentHints = zip(elements, hints).map { HintTarget(element: $0, hint: $1) }
-
-    isHintModeActive = true
+    mode = .hint
     typedChars = ""
     overlay.show(hints: currentHints, style: style, overlayEffect: overlayEffect, animation: appearAnimation, in: window)
   }
 
   private func deactivateHintMode() {
-    isHintModeActive = false
+    mode = .normal
     typedChars = ""
     currentHints = []
     overlay.hide()
+  }
+
+  // MARK: - Scroll hint mode
+
+  private func handleScrollHintKey(_ char: String) {
+    if char == "\u{1B}" {
+      deactivateScrollHintMode()
+      return
+    }
+
+    typedChars += char.lowercased()
+    let matches = currentHints.filter { $0.hint.hasPrefix(typedChars) }
+
+    if matches.isEmpty {
+      deactivateScrollHintMode()
+      return
+    }
+
+    if matches.count == 1 && matches[0].hint == typedChars {
+      if let sv = matches[0].element as? UIScrollView {
+        ScrollController.shared.lock(to: sv)
+      }
+      deactivateScrollHintMode()
+      return
+    }
+
+    overlay.highlight(matching: typedChars)
+  }
+
+  private func activateScrollHintMode() {
+    guard let window = keyWindow() else { return }
+    let scrollViews = ScrollViewScanner.scan(in: window)
+    guard !scrollViews.isEmpty else { return }
+    let hints = HintGenerator.generate(count: scrollViews.count)
+    currentHints = zip(scrollViews, hints).map { HintTarget(element: $0, hint: $1) }
+    mode = .scrollHint
+    typedChars = ""
+    overlay.show(hints: currentHints, style: style, overlayEffect: overlayEffect, animation: appearAnimation, in: window)
+  }
+
+  private func deactivateScrollHintMode() {
+    mode = .normal
+    typedChars = ""
+    currentHints = []
+    overlay.hide()
+  }
+
+  // MARK: - Helpers
+
+  private func keyWindow() -> UIWindow? {
+    UIApplication.shared.connectedScenes
+      .compactMap { $0 as? UIWindowScene }
+      .flatMap { $0.windows }
+      .last { $0.isKeyWindow }
   }
 }
 #endif

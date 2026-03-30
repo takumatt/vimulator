@@ -10,8 +10,17 @@ final class ScrollController {
   private var displayLink: CADisplayLink?
   private var direction: Direction?
   private var lastTimestamp: CFTimeInterval = 0
+  private(set) var lockedScrollView: UIScrollView?
 
   private init() {}
+
+  func lock(to scrollView: UIScrollView) {
+    lockedScrollView = scrollView
+  }
+
+  func unlock() {
+    lockedScrollView = nil
+  }
 
   enum Direction { case up, down, left, right }
 
@@ -77,6 +86,8 @@ final class ScrollController {
   // MARK: - Scroll view discovery
 
   private func findScrollView() -> UIScrollView? {
+    if let locked = lockedScrollView { return locked }
+
     guard let window = keyWindow() else { return nil }
 
     if let responder = UIResponder.currentFirstResponder as? UIView,
