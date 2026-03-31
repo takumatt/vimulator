@@ -2,6 +2,8 @@
 import UIKit
 
 final class SearchBar: UIView {
+  static let height: CGFloat = 52
+  static let margin: CGFloat = 16
   private let icon = UILabel()
   private let queryLabel = UILabel()
 

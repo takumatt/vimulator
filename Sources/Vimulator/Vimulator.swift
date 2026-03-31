@@ -199,11 +199,10 @@ public final class Vimulator {
     overlay.show(hints: currentHints, config: .forElements(style: style, overlayEffect: overlayEffect, animation: appearAnimation), in: window)
 
     // Show search bar in a floating window
-    let barHeight: CGFloat = 52
-    let barMargin: CGFloat = 16
-    let barWidth = window.bounds.width - barMargin * 2
-    let barY = window.bounds.height - window.safeAreaInsets.bottom - barHeight - barMargin
-    searchBar.frame = CGRect(x: barMargin, y: barY, width: barWidth, height: barHeight)
+    let margin = SearchBar.margin
+    let barWidth = window.bounds.width - margin * 2
+    let barY = window.bounds.height - window.safeAreaInsets.bottom - SearchBar.height - margin
+    searchBar.frame = CGRect(x: margin, y: barY, width: barWidth, height: SearchBar.height)
     searchBar.update(query: "")
 
     let w: UIWindow
