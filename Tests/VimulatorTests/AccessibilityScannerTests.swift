@@ -49,15 +49,30 @@ final class AccessibilityScannerTests: XCTestCase {
 
   func testFindsElementsWithCustomAccessibilityActivation() {
     let root = UIView(frame: CGRect(x: 0, y: 0, width: 375, height: 812))
-    let activatable = ActivatableLabel(frame: CGRect(x: 0, y: 0, width: 100, height: 44))
+    let activatable = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 44))
     activatable.isAccessibilityElement = true
     activatable.accessibilityTraits = .staticText
+    activatable.accessibilityLabel = "Search"
+    activatable.accessibilityRespondsToUserInteraction = true
     root.addSubview(activatable)
 
     let results = AccessibilityScanner.scan(in: root)
 
     XCTAssertEqual(results.count, 1)
     XCTAssertTrue(results.first === activatable)
+  }
+
+  func testIgnoresCustomAccessibilityActivationWithoutLabel() {
+    let root = UIView(frame: CGRect(x: 0, y: 0, width: 375, height: 812))
+    let activatable = UIView(frame: CGRect(x: 0, y: 0, width: 100, height: 44))
+    activatable.isAccessibilityElement = true
+    activatable.accessibilityTraits = .staticText
+    activatable.accessibilityRespondsToUserInteraction = true
+    root.addSubview(activatable)
+
+    let results = AccessibilityScanner.scan(in: root)
+
+    XCTAssertTrue(results.isEmpty)
   }
 
   // MARK: - Performance
@@ -112,12 +127,6 @@ final class AccessibilityScannerTests: XCTestCase {
         addChildren(to: container, depth: depth - 1, breadth: breadth)
       }
     }
-  }
-}
-
-private final class ActivatableLabel: UIView {
-  override func accessibilityActivate() -> Bool {
-    true
   }
 }
 #endif
