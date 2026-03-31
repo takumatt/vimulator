@@ -101,7 +101,7 @@ final class ScrollController {
       return sv
     }
 
-    return deepestScrollView(in: window)
+    return largestScrollView(in: window)
   }
 
   private func firstScrollView(from view: UIView) -> UIScrollView? {
@@ -113,12 +113,9 @@ final class ScrollController {
     return nil
   }
 
-  private func deepestScrollView(in view: UIView) -> UIScrollView? {
-    for subview in view.subviews.reversed() {
-      if let found = deepestScrollView(in: subview) { return found }
-    }
-    if let sv = view as? UIScrollView, sv.isScrollEnabled { return sv }
-    return nil
+  private func largestScrollView(in window: UIWindow) -> UIScrollView? {
+    ScrollViewScanner.scan(in: window)
+      .max { $0.bounds.width * $0.bounds.height < $1.bounds.width * $1.bounds.height }
   }
 
   private func clamped(_ offset: CGPoint, in sv: UIScrollView) -> CGPoint {
