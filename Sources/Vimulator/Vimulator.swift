@@ -105,26 +105,7 @@ public final class Vimulator {
   // MARK: - Element hint mode
 
   private func handleHintKey(_ char: String) {
-    if char == "\u{1B}" {
-      deactivateHintMode()
-      return
-    }
-
-    typedChars += char.lowercased()
-    let matches = currentHints.filter { $0.hint.hasPrefix(typedChars) }
-
-    if matches.isEmpty {
-      deactivateHintMode()
-      return
-    }
-
-    if matches.count == 1 && matches[0].hint == typedChars {
-      matches[0].activate()
-      deactivateHintMode()
-      return
-    }
-
-    overlay.highlight(matching: typedChars)
+    handleHintInput(char, onMatch: { $0.activate() })
   }
 
   private func activateHintMode() {
@@ -137,35 +118,14 @@ public final class Vimulator {
     overlay.show(hints: currentHints, config: .forElements(style: style, overlayEffect: overlayEffect, animation: appearAnimation), in: window)
   }
 
-  private func deactivateHintMode() {
-    deactivate()
-  }
-
   // MARK: - Scroll hint mode
 
   private func handleScrollHintKey(_ char: String) {
-    if char == "\u{1B}" {
-      deactivateScrollHintMode()
-      return
-    }
-
-    typedChars += char.lowercased()
-    let matches = currentHints.filter { $0.hint.hasPrefix(typedChars) }
-
-    if matches.isEmpty {
-      deactivateScrollHintMode()
-      return
-    }
-
-    if matches.count == 1 && matches[0].hint == typedChars {
-      if let sv = matches[0].element as? UIScrollView {
+    handleHintInput(char, onMatch: { target in
+      if let sv = target.element as? UIScrollView {
         ScrollController.shared.lock(to: sv)
       }
-      deactivateScrollHintMode()
-      return
-    }
-
-    overlay.highlight(matching: typedChars)
+    })
   }
 
   private func activateScrollHintMode() {
@@ -274,6 +234,25 @@ public final class Vimulator {
     typedChars = ""
     currentHints = []
     overlay.hide()
+  }
+
+  /// Shared key handler for hint and scrollHint modes.
+  /// Filters by prefix; calls `onMatch` and deactivates when exactly one hint is fully typed.
+  private func handleHintInput(_ char: String, onMatch: (HintTarget) -> Void) {
+    if char == "\u{1B}" { deactivate(); return }
+
+    typedChars += char.lowercased()
+    let matches = currentHints.filter { $0.hint.hasPrefix(typedChars) }
+
+    if matches.isEmpty { deactivate(); return }
+
+    if matches.count == 1 && matches[0].hint == typedChars {
+      onMatch(matches[0])
+      deactivate()
+      return
+    }
+
+    overlay.highlight(matching: typedChars)
   }
 
   private func keyWindow() -> UIWindow? {
