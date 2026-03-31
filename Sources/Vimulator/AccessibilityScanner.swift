@@ -40,7 +40,17 @@ enum AccessibilityScanner {
 
   private static func isInteractive(_ element: NSObject) -> Bool {
     if let control = element as? UIControl { return control.isEnabled }
-    return !element.accessibilityTraits.intersection(interactiveTraits).isEmpty
+    if !element.accessibilityTraits.intersection(interactiveTraits).isEmpty {
+      return true
+    }
+    return element.accessibilityRespondsToUserInteraction && hasAccessibleName(element)
+  }
+
+  private static func hasAccessibleName(_ element: NSObject) -> Bool {
+    guard let label = element.accessibilityLabel else {
+      return false
+    }
+    return !label.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
   }
 }
 #endif
