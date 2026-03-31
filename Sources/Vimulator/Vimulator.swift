@@ -138,10 +138,7 @@ public final class Vimulator {
   }
 
   private func deactivateHintMode() {
-    mode = .normal
-    typedChars = ""
-    currentHints = []
-    overlay.hide()
+    deactivate()
   }
 
   // MARK: - Scroll hint mode
@@ -183,10 +180,7 @@ public final class Vimulator {
   }
 
   private func deactivateScrollHintMode() {
-    mode = .normal
-    typedChars = ""
-    currentHints = []
-    overlay.hide()
+    deactivate()
   }
 
   // MARK: - Search mode
@@ -267,16 +261,20 @@ public final class Vimulator {
   }
 
   private func deactivateSearchMode() {
-    mode = .normal
-    typedChars = ""
-    currentHints = []
-    overlay.hide()
+    deactivate()
     searchBarWindow?.isHidden = true
     searchBarWindow?.subviews.forEach { $0.removeFromSuperview() }
     searchBarWindow = nil
   }
 
   // MARK: - Helpers
+
+  private func deactivate() {
+    mode = .normal
+    typedChars = ""
+    currentHints = []
+    overlay.hide()
+  }
 
   private func keyWindow() -> UIWindow? {
     UIApplication.shared.keyWindowInConnectedScenes
