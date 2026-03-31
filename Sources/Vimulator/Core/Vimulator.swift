@@ -189,6 +189,9 @@ public final class Vimulator {
   }
 
   private func activateSearchMode() {
+    // TODO: Consider showing only the overlay effect (no hint labels) in search mode.
+    // Hint labels are visible but irrelevant — the user filters by accessibility label text,
+    // not by hint string. Showing labels may be confusing.
     guard let window = keyWindow() else { return }
     let elements = AccessibilityScanner.scan(in: window)
     let hints = HintGenerator.generate(count: elements.count)
