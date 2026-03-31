@@ -6,6 +6,7 @@ xcuserdata/
 # Build artifacts
 .build/
 DerivedData/
+Derived/
 
 # SPM
 .swiftpm/xcode/
