@@ -22,7 +22,15 @@ final class HintLabel: UIView {
     layer.borderColor = style.borderColor.cgColor
     layer.masksToBounds = true
 
-    if style.useBlur {
+    if style.useGlass, #available(iOS 26, *) {
+      let effect = UIGlassEffect()
+      effect.tintColor = style.glassTintColor
+      let glass = UIVisualEffectView(effect: effect)
+      glass.frame = bounds
+      glass.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+      addSubview(glass)
+      blurView = glass
+    } else if style.useBlur {
       let blur = UIVisualEffectView(effect: UIBlurEffect(style: style.blurStyle))
       blur.frame = bounds
       blur.autoresizingMask = [.flexibleWidth, .flexibleHeight]

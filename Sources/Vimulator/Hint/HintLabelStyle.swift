@@ -4,6 +4,8 @@ import UIKit
 public struct HintLabelStyle {
   // Background
   public var backgroundColor: UIColor
+  public var useGlass: Bool
+  public var glassTintColor: UIColor
   public var useBlur: Bool
   public var blurStyle: UIBlurEffect.Style
 
@@ -24,6 +26,8 @@ public struct HintLabelStyle {
 
   public init(
     backgroundColor: UIColor,
+    useGlass: Bool = false,
+    glassTintColor: UIColor = UIColor(red: 1.0, green: 0.96, blue: 0.4, alpha: 0.35),
     useBlur: Bool = false,
     blurStyle: UIBlurEffect.Style = .systemMaterial,
     borderColor: UIColor = .clear,
@@ -35,6 +39,8 @@ public struct HintLabelStyle {
     padding: CGFloat = 3
   ) {
     self.backgroundColor = backgroundColor
+    self.useGlass = useGlass
+    self.glassTintColor = glassTintColor
     self.useBlur = useBlur
     self.blurStyle = blurStyle
     self.borderColor = borderColor
@@ -96,6 +102,21 @@ public extension HintLabelStyle {
     matchedPrefixColor: UIColor(red: 1, green: 0.45, blue: 0.45, alpha: 1),
     font: .monospacedSystemFont(ofSize: 11, weight: .bold),
     padding: 3
+  )
+
+  /// Liquid Glass badge (iOS 26+, falls back to blur on earlier versions).
+  static let glass = HintLabelStyle(
+    backgroundColor: .clear,
+    useGlass: true,
+    useBlur: true,
+    blurStyle: .systemUltraThinMaterial,
+    borderColor: UIColor(white: 1, alpha: 0.25),
+    borderWidth: 0.5,
+    cornerRadius: 8,
+    textColor: .label,
+    matchedPrefixColor: .systemBlue,
+    font: .monospacedSystemFont(ofSize: 11, weight: .semibold),
+    padding: 5
   )
 
   /// System accent color badge.
