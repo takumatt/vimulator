@@ -40,7 +40,7 @@ Holding a scroll key scrolls continuously at 600 pt/sec.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/takumatt/vimulator", from: "0.1.0")
+    .package(url: "https://github.com/takumatt/vimulator", from: "0.3.0")
 ]
 ```
 
@@ -136,6 +136,26 @@ Vimulator.shared.appearAnimation = .none
 Vimulator.shared.appearAnimation = .fade()           // 0.15s (default)
 Vimulator.shared.appearAnimation = .fade(duration: 0.3)
 ```
+
+## Limitations
+
+### `onTapGesture` requires explicit accessibility action
+
+SwiftUI's `onTapGesture` does not automatically register an accessibility action. Vimulator activates elements via `accessibilityActivate()`, which won't trigger the gesture handler.
+
+```swift
+// Won't work with Vimulator
+Text("Tap me")
+    .onTapGesture { doSomething() }
+
+// Add accessibilityAction for Vimulator support
+Text("Tap me")
+    .onTapGesture { doSomething() }
+    .accessibilityAddTraits(.isButton)
+    .accessibilityAction { doSomething() }
+```
+
+This also improves VoiceOver support — a good accessibility practice regardless of Vimulator.
 
 ## How it works
 
