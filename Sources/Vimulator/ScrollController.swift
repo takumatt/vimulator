@@ -87,30 +87,8 @@ final class ScrollController {
 
   private func findScrollView() -> UIScrollView? {
     if let locked = lockedScrollView { return locked }
-
     guard let window = keyWindow() else { return nil }
-
-    if let responder = UIResponder.currentFirstResponder as? UIView,
-       let sv = firstScrollView(from: responder) {
-      return sv
-    }
-
-    let center = CGPoint(x: window.bounds.midX, y: window.bounds.midY)
-    if let hit = window.hitTest(center, with: nil),
-       let sv = firstScrollView(from: hit) {
-      return sv
-    }
-
     return largestScrollView(in: window)
-  }
-
-  private func firstScrollView(from view: UIView) -> UIScrollView? {
-    var v: UIView? = view
-    while let current = v {
-      if let sv = current as? UIScrollView, sv.isScrollEnabled { return sv }
-      v = current.superview
-    }
-    return nil
   }
 
   private func largestScrollView(in window: UIWindow) -> UIScrollView? {
