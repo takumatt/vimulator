@@ -40,7 +40,7 @@ Holding a scroll key scrolls continuously at 600 pt/sec.
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/takumatt/vimulator", from: "0.1.0")
+    .package(url: "https://github.com/takumatt/vimulator", from: "0.3.0")
 ]
 ```
 
@@ -140,7 +140,7 @@ Vimulator.shared.appearAnimation = .fade(duration: 0.3)
 ## How it works
 
 - **Keyboard monitoring** — swizzles `UIApplication.sendEvent` to intercept hardware key events globally
-- **Hint mode** — walks the UIAccessibility tree to collect interactive elements, renders a transparent `UIWindow` overlay with hint labels
+- **Hint mode** — walks the UIAccessibility tree to collect interactive elements and elements with custom accessibility activation, then renders a transparent `UIWindow` overlay with hint labels
 - **Activation** — calls `accessibilityActivate()` on the target element; falls back to `becomeFirstResponder()` for text inputs and `UIControl.sendActions` for controls
 - **Scrolling** — uses `CADisplayLink` to move `contentOffset` at a fixed velocity per frame, with `adjustedContentInset`-aware clamping
 

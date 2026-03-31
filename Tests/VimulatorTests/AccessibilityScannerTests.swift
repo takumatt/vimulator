@@ -47,6 +47,19 @@ final class AccessibilityScannerTests: XCTestCase {
     XCTAssertEqual(results.count, 1)
   }
 
+  func testFindsElementsWithCustomAccessibilityActivation() {
+    let root = UIView(frame: CGRect(x: 0, y: 0, width: 375, height: 812))
+    let activatable = ActivatableLabel(frame: CGRect(x: 0, y: 0, width: 100, height: 44))
+    activatable.isAccessibilityElement = true
+    activatable.accessibilityTraits = .staticText
+    root.addSubview(activatable)
+
+    let results = AccessibilityScanner.scan(in: root)
+
+    XCTAssertEqual(results.count, 1)
+    XCTAssertTrue(results.first === activatable)
+  }
+
   // MARK: - Performance
 
   func testPerformanceShallowHierarchy() {
@@ -99,6 +112,12 @@ final class AccessibilityScannerTests: XCTestCase {
         addChildren(to: container, depth: depth - 1, breadth: breadth)
       }
     }
+  }
+}
+
+private final class ActivatableLabel: UIView {
+  override func accessibilityActivate() -> Bool {
+    true
   }
 }
 #endif

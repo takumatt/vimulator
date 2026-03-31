@@ -1,4 +1,5 @@
 #if targetEnvironment(simulator)
+import ObjectiveC.runtime
 import UIKit
 
 enum AccessibilityScanner {
@@ -40,7 +41,48 @@ enum AccessibilityScanner {
 
   private static func isInteractive(_ element: NSObject) -> Bool {
     if let control = element as? UIControl { return control.isEnabled }
-    return !element.accessibilityTraits.intersection(interactiveTraits).isEmpty
+    if !element.accessibilityTraits.intersection(interactiveTraits).isEmpty {
+      return true
+    }
+    return hasCustomAccessibilityActivation(element)
+  }
+
+  private static func hasCustomAccessibilityActivation(_ element: NSObject) -> Bool {
+    let selector = NSSelectorFromString("accessibilityActivate")
+    let baselineClass: AnyClass = baselineClass(for: element)
+
+    var currentClass: AnyClass? = object_getClass(element)
+    while let current = currentClass, current != baselineClass {
+      guard
+        let method = class_getInstanceMethod(current, selector),
+        let superclass = class_getSuperclass(current),
+        let superMethod = class_getInstanceMethod(superclass, selector)
+      else {
+        currentClass = class_getSuperclass(current)
+        continue
+      }
+
+      if method_getImplementation(method) != method_getImplementation(superMethod) {
+        return true
+      }
+
+      currentClass = superclass
+    }
+
+    return false
+  }
+
+  private static func baselineClass(for element: NSObject) -> AnyClass {
+    if element is UIView {
+      return UIView.self
+    }
+
+    if let accessibilityElementClass = NSClassFromString("UIAccessibilityElement"),
+       element.isKind(of: accessibilityElementClass) {
+      return accessibilityElementClass
+    }
+
+    return NSObject.self
   }
 }
 #endif
