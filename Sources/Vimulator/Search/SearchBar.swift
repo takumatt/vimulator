@@ -15,12 +15,23 @@ final class SearchBar: UIView {
   required init?(coder: NSCoder) { fatalError() }
 
   private func setup() {
-    backgroundColor = UIColor.systemBackground.withAlphaComponent(0.95)
-    layer.cornerRadius = 10
+    backgroundColor = .clear
+    layer.cornerRadius = SearchBar.height / 2
     layer.shadowColor = UIColor.black.cgColor
     layer.shadowOpacity = 0.15
     layer.shadowRadius = 8
     layer.shadowOffset = CGSize(width: 0, height: -2)
+
+    let visualEffect: UIVisualEffectView
+    if #available(iOS 26, *) {
+      visualEffect = .init(effect: UIGlassEffect())
+    } else {
+      visualEffect = .init(effect: UIBlurEffect(style: .systemMaterial))
+    }
+    visualEffect.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    visualEffect.layer.cornerRadius = SearchBar.height / 2
+    visualEffect.clipsToBounds = true
+    insertSubview(visualEffect, at: 0)
 
     icon.text = "/"
     icon.font = .monospacedSystemFont(ofSize: 16, weight: .bold)
@@ -41,7 +52,7 @@ final class SearchBar: UIView {
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    let padding: CGFloat = 16
+    let padding: CGFloat = 24
     icon.frame.origin = CGPoint(x: padding, y: (bounds.height - icon.bounds.height) / 2)
     queryLabel.frame = CGRect(
       x: icon.frame.maxX + 8,
