@@ -8,6 +8,7 @@ final class HintOverlay {
   enum LabelPosition { case topLeading, center }
 
   func show(hints: [HintTarget], config: HintOverlayConfiguration, in keyWindow: UIWindow) {
+    if window != nil { hide() }
     let style = config.style
     let overlayEffect = config.overlayEffect
     let animation = config.animation
