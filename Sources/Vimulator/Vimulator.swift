@@ -73,6 +73,13 @@ public final class Vimulator {
         lastGTime = now
       }
     case "G": ScrollController.shared.scrollToBottom()
+    case "1", "2", "3", "4", "5":
+      if let index = Int(char), let tbc = tabBarController() {
+        let target = index - 1
+        if target < tbc.viewControllers?.count ?? 0 {
+          tbc.selectedIndex = target
+        }
+      }
     case "\u{1B}": // Escape releases scroll lock
       ScrollController.shared.unlock()
     default: break
@@ -276,6 +283,22 @@ public final class Vimulator {
       .compactMap { $0 as? UIWindowScene }
       .flatMap { $0.windows }
       .last { $0.isKeyWindow }
+  }
+
+  private func tabBarController() -> UITabBarController? {
+    guard let root = keyWindow()?.rootViewController else { return nil }
+    return findTabBarController(in: root)
+  }
+
+  private func findTabBarController(in vc: UIViewController) -> UITabBarController? {
+    if let tbc = vc as? UITabBarController { return tbc }
+    for child in vc.children {
+      if let found = findTabBarController(in: child) { return found }
+    }
+    if let presented = vc.presentedViewController {
+      return findTabBarController(in: presented)
+    }
+    return nil
   }
 }
 #endif

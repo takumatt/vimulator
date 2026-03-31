@@ -26,6 +26,7 @@ Vimulator runs **inside your app process**. It talks directly to UIKit with no I
 | `gg` | Scroll to top |
 | `G` | Scroll to bottom |
 | `F` | Select a scroll view to lock `hjkl` to |
+| `1` – `5` | Switch to the nth tab bar item |
 
 Holding a scroll key scrolls continuously at 600 pt/sec.
 
