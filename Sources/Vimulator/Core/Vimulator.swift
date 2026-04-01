@@ -6,7 +6,7 @@ public final class Vimulator {
   public static let shared = Vimulator()
 
   public var hintTheme: HintTheme = .vimium
-  public var searchTheme: SearchTheme = .glass
+  public var searchTheme: SearchTheme = .glass()
   public var overlayEffect: HintOverlayEffect = .none
   public var appearAnimation: HintAppearAnimation = .fade()
   public var hintKey: String = "f"

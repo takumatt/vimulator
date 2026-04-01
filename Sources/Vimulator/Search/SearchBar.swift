@@ -32,7 +32,7 @@ final class SearchBar: UIView {
     queryLabel.text = ""
 
     [icon, queryLabel].forEach { addSubview($0) }
-    apply(theme: .glass)
+    apply(theme: .glass())
   }
 
   func apply(theme: SearchTheme) {
