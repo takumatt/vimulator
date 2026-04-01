@@ -2,12 +2,17 @@
 import UIKit
 
 public enum SearchTheme {
-  case glass
+  case glass(tint: UIColor = .clear)
   case simple
 
   var useGlass: Bool {
     if case .glass = self { return true }
     return false
+  }
+
+  var glassTint: UIColor {
+    if case .glass(let tint) = self { return tint }
+    return .clear
   }
 
   var backgroundColor: UIColor {

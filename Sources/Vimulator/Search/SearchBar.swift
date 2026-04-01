@@ -40,7 +40,9 @@ final class SearchBar: UIView {
     let bg: UIView
 
     if theme.useGlass, #available(iOS 26, *) {
-      let v = UIVisualEffectView(effect: UIGlassEffect())
+      let effect = UIGlassEffect()
+      if theme.glassTint != .clear { effect.tintColor = theme.glassTint }
+      let v = UIVisualEffectView(effect: effect)
       v.clipsToBounds = true
       bg = v
     } else {

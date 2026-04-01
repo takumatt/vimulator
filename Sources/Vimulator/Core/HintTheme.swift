@@ -3,7 +3,7 @@ import UIKit
 
 public enum HintTheme {
   case vimium
-  case glass
+  case glass(tint: UIColor = UIColor(red: 1.0, green: 0.96, blue: 0.4, alpha: 0.35))
   case simple
 
   var style: HintLabelStyle {
@@ -19,10 +19,11 @@ public enum HintTheme {
         font: .monospacedSystemFont(ofSize: 11, weight: .bold),
         padding: 3
       )
-    case .glass:
+    case .glass(let tint):
       return HintLabelStyle(
         backgroundColor: .clear,
         useGlass: true,
+        glassTintColor: tint,
         useBlur: true,
         blurStyle: .systemUltraThinMaterial,
         borderColor: UIColor(white: 1, alpha: 0.25),
