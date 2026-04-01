@@ -181,7 +181,7 @@ public final class Vimulator {
     let query = typedChars
     let matches = currentHints.filter { matchesQuery($0, query: query) }
     let visibleHints = Set(matches.map { $0.hint })
-    overlay.filterByHints(visibleHints)
+    overlay.updateSearchHighlights(visibleHints: visibleHints)
 
     if matches.count == 1 {
       matches[0].activate()
@@ -190,9 +190,6 @@ public final class Vimulator {
   }
 
   private func activateSearchMode() {
-    // TODO: Consider showing only the overlay effect (no hint labels) in search mode.
-    // Hint labels are visible but irrelevant — the user filters by accessibility label text,
-    // not by hint string. Showing labels may be confusing.
     guard let window = keyWindow() else { return }
     let elements = AccessibilityScanner.scan(in: window)
     let hints = HintGenerator.generate(count: elements.count)
@@ -200,7 +197,7 @@ public final class Vimulator {
     mode = .search
     typedChars = ""
 
-    overlay.show(hints: currentHints, config: .forElements(style: hintTheme.style, overlayEffect: overlayEffect, animation: appearAnimation), in: window)
+    overlay.showSearch(targets: currentHints, effect: overlayEffect, animation: appearAnimation, in: window)
 
     // Show search bar in a floating window
     let margin = SearchBar.margin

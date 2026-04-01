@@ -3,7 +3,8 @@ import UIKit
 
 final class HintOverlay {
   private var window: UIWindow?
-  private var labels: [String: HintLabel] = [:]  // hint string → label
+  private var labels: [String: HintLabel] = [:]        // hint string → label
+  private var highlights: [String: UIView] = [:]       // hint string → highlight frame
 
   enum LabelPosition { case topLeading, center }
 
@@ -94,11 +95,70 @@ final class HintOverlay {
     }
   }
 
+  /// Show overlay effect + element frame highlights for search mode (no hint labels).
+  func showSearch(targets: [HintTarget], effect: HintOverlayEffect, animation: HintAppearAnimation, in keyWindow: UIWindow) {
+    if window != nil { hide() }
+    let overlayWindow = makeWindow(over: keyWindow)
+    window = overlayWindow
+
+    switch effect {
+    case .none: break
+    case .dim(let color):
+      let dimView = UIView(frame: overlayWindow.bounds)
+      dimView.backgroundColor = color
+      dimView.isUserInteractionEnabled = false
+      overlayWindow.addSubview(dimView)
+    case .blur(let blurStyle, let opacity):
+      let blurView = UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
+      blurView.frame = overlayWindow.bounds
+      blurView.alpha = opacity
+      blurView.isUserInteractionEnabled = false
+      overlayWindow.addSubview(blurView)
+    }
+
+    let container = UIView(frame: overlayWindow.bounds)
+    container.isUserInteractionEnabled = false
+    container.backgroundColor = .clear
+    overlayWindow.addSubview(container)
+
+    highlights = [:]
+    for target in targets {
+      guard let frame = target.element.accessibilityFrame(in: overlayWindow) else { continue }
+      let v = UIView(frame: frame)
+      v.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.12)
+      v.layer.borderColor = UIColor.systemBlue.withAlphaComponent(0.5).cgColor
+      v.layer.borderWidth = 1.5
+      v.layer.cornerRadius = 8
+      v.isUserInteractionEnabled = false
+      container.addSubview(v)
+      highlights[target.hint] = v
+    }
+
+    switch animation {
+    case .none:
+      overlayWindow.isHidden = false
+    case .fade(let duration):
+      overlayWindow.alpha = 0
+      overlayWindow.isHidden = false
+      UIView.animate(withDuration: duration, delay: 0, options: .curveEaseOut) {
+        overlayWindow.alpha = 1
+      }
+    }
+  }
+
+  /// Update which element highlights are visible based on search matches.
+  func updateSearchHighlights(visibleHints: Set<String>) {
+    for (hint, view) in highlights {
+      view.alpha = visibleHints.contains(hint) ? 1.0 : 0.0
+    }
+  }
+
   func hide() {
     window?.isHidden = true
     window?.subviews.forEach { $0.removeFromSuperview() }
     window = nil
     labels = [:]
+    highlights = [:]
   }
 
   private func makeWindow(over keyWindow: UIWindow) -> UIWindow {
