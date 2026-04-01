@@ -67,6 +67,7 @@ final class SearchBar: UIView {
 
   override func layoutSubviews() {
     super.layoutSubviews()
+    backgroundView?.frame = bounds
     let padding: CGFloat = 24
     icon.frame.origin = CGPoint(x: padding, y: (bounds.height - icon.bounds.height) / 2)
     queryLabel.frame = CGRect(
