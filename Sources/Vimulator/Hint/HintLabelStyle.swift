@@ -1,30 +1,30 @@
 #if targetEnvironment(simulator)
 import UIKit
 
-public struct HintLabelStyle {
+struct HintLabelStyle {
   // Background
-  public var backgroundColor: UIColor
-  public var useGlass: Bool
-  public var glassTintColor: UIColor
-  public var useBlur: Bool
-  public var blurStyle: UIBlurEffect.Style
+  var backgroundColor: UIColor
+  var useGlass: Bool
+  var glassTintColor: UIColor
+  var useBlur: Bool
+  var blurStyle: UIBlurEffect.Style
 
   // Border
-  public var borderColor: UIColor
-  public var borderWidth: CGFloat
+  var borderColor: UIColor
+  var borderWidth: CGFloat
 
   // Corner
-  public var cornerRadius: CGFloat
+  var cornerRadius: CGFloat
 
   // Text
-  public var textColor: UIColor
-  public var matchedPrefixColor: UIColor
-  public var font: UIFont
+  var textColor: UIColor
+  var matchedPrefixColor: UIColor
+  var font: UIFont
 
   // Padding
-  public var padding: CGFloat
+  var padding: CGFloat
 
-  public init(
+  init(
     backgroundColor: UIColor,
     useGlass: Bool = false,
     glassTintColor: UIColor = UIColor(red: 1.0, green: 0.96, blue: 0.4, alpha: 0.35),
@@ -53,7 +53,7 @@ public struct HintLabelStyle {
   }
 }
 
-public extension HintLabelStyle {
+extension HintLabelStyle {
   /// Classic Vimium-style yellow badge.
   static let vimium = HintLabelStyle(
     backgroundColor: UIColor(red: 1.0, green: 0.96, blue: 0.4, alpha: 0.92),

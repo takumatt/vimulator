@@ -4,8 +4,10 @@ import UIKit
 final class SearchBar: UIView {
   static let height: CGFloat = 52
   static let margin: CGFloat = 16
+
   private let icon = UILabel()
   private let queryLabel = UILabel()
+  private var backgroundView: UIView?
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -22,36 +24,50 @@ final class SearchBar: UIView {
     layer.shadowRadius = 8
     layer.shadowOffset = CGSize(width: 0, height: -2)
 
-    let visualEffect: UIVisualEffectView
-    if #available(iOS 26, *) {
-      visualEffect = .init(effect: UIGlassEffect())
-    } else {
-      visualEffect = .init(effect: UIBlurEffect(style: .systemMaterial))
-    }
-    visualEffect.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    visualEffect.layer.cornerRadius = SearchBar.height / 2
-    visualEffect.clipsToBounds = true
-    insertSubview(visualEffect, at: 0)
-
     icon.text = "/"
     icon.font = .monospacedSystemFont(ofSize: 16, weight: .bold)
-    icon.textColor = .secondaryLabel
     icon.sizeToFit()
 
     queryLabel.font = .monospacedSystemFont(ofSize: 16, weight: .regular)
-    queryLabel.textColor = .label
     queryLabel.text = ""
 
     [icon, queryLabel].forEach { addSubview($0) }
+    apply(theme: .glass())
+  }
+
+  func apply(theme: SearchTheme) {
+    backgroundView?.removeFromSuperview()
+    let bg: UIView
+
+    if theme.useGlass, #available(iOS 26, *) {
+      let effect = UIGlassEffect()
+      if theme.glassTint != .clear { effect.tintColor = theme.glassTint }
+      let v = UIVisualEffectView(effect: effect)
+      v.clipsToBounds = true
+      bg = v
+    } else {
+      let v = UIView()
+      v.backgroundColor = theme.backgroundColor
+      bg = v
+    }
+
+    bg.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    bg.layer.cornerRadius = SearchBar.height / 2
+    insertSubview(bg, at: 0)
+    backgroundView = bg
+
+    icon.textColor = theme.textColor.withAlphaComponent(0.5)
+    queryLabel.textColor = theme.textColor
   }
 
   func update(query: String) {
     queryLabel.text = query.isEmpty ? "type to search..." : query
-    queryLabel.textColor = query.isEmpty ? .tertiaryLabel : .label
+    queryLabel.alpha = query.isEmpty ? 0.4 : 1.0
   }
 
   override func layoutSubviews() {
     super.layoutSubviews()
+    backgroundView?.frame = bounds
     let padding: CGFloat = 24
     icon.frame.origin = CGPoint(x: padding, y: (bounds.height - icon.bounds.height) / 2)
     queryLabel.frame = CGRect(

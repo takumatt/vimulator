@@ -11,7 +11,8 @@ import Vimulator
 @main
 struct VimulatorExampleApp: App {
   init() {
-    Vimulator.shared.style = .dark
+    Vimulator.shared.hintTheme = .glass(tint: .clear)
+    Vimulator.shared.searchTheme = .glass(tint: .clear)
     Vimulator.shared.install()
   }
 
