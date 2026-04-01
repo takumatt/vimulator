@@ -5,7 +5,8 @@ import UIKit
 public final class Vimulator {
   public static let shared = Vimulator()
 
-  public var style: HintLabelStyle = .vimium
+  public var hintTheme: HintTheme = .vimium
+  public var searchTheme: SearchTheme = .glass
   public var overlayEffect: HintOverlayEffect = .none
   public var appearAnimation: HintAppearAnimation = .fade()
   public var hintKey: String = "f"
@@ -115,7 +116,7 @@ public final class Vimulator {
     currentHints = zip(elements, hints).map { HintTarget(element: $0, hint: $1) }
     mode = .hint
     typedChars = ""
-    overlay.show(hints: currentHints, config: .forElements(style: style, overlayEffect: overlayEffect, animation: appearAnimation), in: window)
+    overlay.show(hints: currentHints, config: .forElements(style: hintTheme.style, overlayEffect: overlayEffect, animation: appearAnimation), in: window)
   }
 
   // MARK: - Scroll hint mode
@@ -136,7 +137,7 @@ public final class Vimulator {
     currentHints = zip(scrollViews, hints).map { HintTarget(element: $0, hint: $1) }
     mode = .scrollHint
     typedChars = ""
-    overlay.show(hints: currentHints, config: .forScrollViews(style: style, overlayEffect: overlayEffect, animation: appearAnimation), in: window)
+    overlay.show(hints: currentHints, config: .forScrollViews(style: hintTheme.style, overlayEffect: overlayEffect, animation: appearAnimation), in: window)
   }
 
   private func deactivateScrollHintMode() {
@@ -199,13 +200,14 @@ public final class Vimulator {
     mode = .search
     typedChars = ""
 
-    overlay.show(hints: currentHints, config: .forElements(style: style, overlayEffect: overlayEffect, animation: appearAnimation), in: window)
+    overlay.show(hints: currentHints, config: .forElements(style: hintTheme.style, overlayEffect: overlayEffect, animation: appearAnimation), in: window)
 
     // Show search bar in a floating window
     let margin = SearchBar.margin
     let barWidth = window.bounds.width - margin * 2
     let barY = window.bounds.height - window.safeAreaInsets.bottom - SearchBar.height - margin
     searchBar.frame = CGRect(x: margin, y: barY, width: barWidth, height: SearchBar.height)
+    searchBar.apply(theme: searchTheme)
     searchBar.update(query: "")
 
     let w: UIWindow
