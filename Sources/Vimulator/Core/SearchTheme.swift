@@ -2,7 +2,7 @@
 import UIKit
 
 public enum SearchTheme {
-  case glass(tint: UIColor = .clear)
+  case glass(tinted: UIColor = .clear)
   case simple
 
   var useGlass: Bool {
